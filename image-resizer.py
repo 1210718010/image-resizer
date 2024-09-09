@@ -17,7 +17,18 @@ def resizer(path):
     out_path = path.replace('/', '_')
     if os.path.isfile(f'./static/{out_path}'):
         os.utime(f'./static/{out_path}', None)
-        return send_from_directory(app.static_folder, out_path)
+        fileEx = path.split('@')[1].split('.')[1]
+        if fileEx.lower() == 'webp':
+            mimetype = 'image/webp'
+        elif fileEx.lower() == 'jpg' or fileEx.lower() == 'jpeg':
+            mimetype = 'image/jpeg'
+        elif fileEx.lower() == 'png':
+            mimetype = 'image/png'
+        elif fileEx.lower() == 'gif':
+            mimetype = 'image/gif'
+        elif fileEx.lower() == 'ico':
+            mimetype = 'image/x-icon'
+        return send_from_directory(app.static_folder, out_path, mimetype=mimetype)
     else:
         image = f'./{path.split("@")[0]}'
         parameter = path.split('@')[1].split('.')[0]
