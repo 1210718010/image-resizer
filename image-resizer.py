@@ -52,8 +52,8 @@ def resizer(path):
             resized = img.resize((out_w, out_h), Image.BILINEAR)
             resized.save(f'./static/{out_path}')
         else:
-            img = Image.open(image)
-            img.save(f'./static/{out_path}')
+            resized = Image.open(image)
+            resized.save(f'./static/{out_path}')
 
         if fileEx.lower() == 'webp':
             io_type = 'WebP'
