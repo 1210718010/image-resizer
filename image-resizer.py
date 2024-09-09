@@ -15,8 +15,8 @@ app = Flask(__name__, static_folder='static')
 #   http://127.0.0.1:10000/example.avif@256w.png
 #   http://127.0.0.1:10000/example.ico@.gif
 #   http://127.0.0.1:10000/example.gif@64w_64w.ico
-#   宽或高超出原式图片时，仅转换格式，不改变图片尺寸
-#   宽和高都指定时，保持原比例，取在原宽或原高中占比更大的
+#   宽或高超出原图时，仅转换格式，不改变图片尺寸
+#   宽和高都指定时，依旧保持原比例，以在原宽或原高中占比更大的那一边为标准进行缩小
 
 def resizer(path):
 
