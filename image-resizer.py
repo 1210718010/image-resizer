@@ -9,12 +9,14 @@ app = Flask(__name__, static_folder='static')
 @app.route('/<path:path>', methods=['GET', 'POST'])
 
 #   格式参考B站，示例：
-#   http://127.0.0.1:10000/example.ico@.webp
-#   http://127.0.0.1:10000/example.gif@128w.avif
-#   http://127.0.0.1:10000/example.png@256h.jpg
-#   http://127.0.0.1:10000/example.jpg@512w.png
-#   http://127.0.0.1:10000/example.avif@.gif
-#   http://127.0.0.1:10000/example.webp@64w.ico
+#   http://127.0.0.1:10000/example.jpg@1920w_1080w.webp
+#   http://127.0.0.1:10000/example.png@800w_800h.avif
+#   http://127.0.0.1:10000/example.webp@512h.jpg
+#   http://127.0.0.1:10000/example.avif@256w.png
+#   http://127.0.0.1:10000/example.ico@.gif
+#   http://127.0.0.1:10000/example.gif@64w_64w.ico
+#   宽或高超出原式图片时，仅转换格式，不改变图片尺寸
+#   宽和高都指定时，保持原比例，取在原宽或原高中占比更大的
 
 def resizer(path):
 
@@ -46,18 +48,29 @@ def resizer(path):
 
     else:
         image = f'./{path.split("@")[0]}'
-        parameter = path.split('@')[1].split('.')[0]
-        fileEx = path.split('@')[1].split('.')[1]
-
         img = Image.open(image)
-        if 'w' in parameter:
+
+        parameter = path.split('@')[1].split('.')[0]
+        if 'w' in parameter and 'h' in parameter:
+            out_w = int(parameter.split('_')[0].replace('w', ''))
+            out_h = int(parameter.split('_')[1].replace('h', ''))
+            if out_w/img.width < 1 and out_h/img.height < 1:
+                if out_w/img.width >= out_h/img.height:
+                    out_h = round(out_w*img.height/img.width)
+                    img = img.resize((out_w, out_h), Image.BILINEAR)
+                    img.save(f'./static/{out_path}')
+                else:
+                    out_w = round(out_h*img.width/img.height)
+                    img = img.resize((out_w, out_h), Image.BILINEAR)
+                    img.save(f'./static/{out_path}')
+        elif 'w' in parameter:
             out_w = int(parameter.replace('w', ''))
             if out_w < img.width:
                 out_h = round(out_w*img.height/img.width)
                 img = img.resize((out_w, out_h), Image.BILINEAR)
                 img.save(f'./static/{out_path}')
         elif 'h' in parameter:
-            out_h = int(parameter.replace('w', ''))
+            out_h = int(parameter.replace('h', ''))
             if out_h < img.height:
                 out_w = round(out_h*img.width/img.height)
                 img = img.resize((out_w, out_h), Image.BILINEAR)
