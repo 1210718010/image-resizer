@@ -6,7 +6,7 @@ while True:
         dirToBeEmptied = './static/'
  
         ds = list(os.walk(dirToBeEmptied))
-        delta = datetime.timedelta(days=7)
+        delta = datetime.timedelta(days=14)
         now = datetime.datetime.now()
  
         for d in ds:
