@@ -3,13 +3,13 @@ import time
 import datetime
 
 print('cache-cleaner\n')
+    
+dirToBeEmptied = './static/'
 
 while True:
-
-    dirToBeEmptied = './static/'
  
     ds = list(os.walk(dirToBeEmptied))
-    delta = datetime.timedelta(days=14)
+    delta = datetime.timedelta(days=30)
     now = datetime.datetime.now()
 
     n = 0
@@ -29,4 +29,6 @@ while True:
     else:
         print(f'共删除了{n}张缓存图片')
 
-    time.sleep(3600)
+    dirToBeEmptied = './'
+
+    time.sleep(86400)
