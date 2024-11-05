@@ -1,4 +1,4 @@
-from flask import Flask, send_from_directory, send_file
+from flask import Flask, send_from_directory, send_file, make_response
 from PIL import Image
 import pillow_avif
 from io import BytesIO
@@ -47,40 +47,45 @@ def resizer(path):
         return send_from_directory(app.static_folder, out_path, mimetype=io_mimetype)
 
     else:
-        image = f'./{path.split("@")[0]}'
-        img = Image.open(image)
+        if os.path.isfile(f'C:/Users/Admin/Documents/img/{path.split("@")[0]}'):
+            image = f'C:/Users/Admin/Documents/img/{path.split("@")[0]}'
+            print(image)
+            img = Image.open(image)
 
-        parameter = path.split('@')[1].split('.')[0]
-        if 'w' in parameter and 'h' in parameter:
-            out_w = int(parameter.split('_')[0].replace('w', ''))
-            out_h = int(parameter.split('_')[1].replace('h', ''))
-            if out_w/img.width < 1 and out_h/img.height < 1:
-                if out_w/img.width >= out_h/img.height:
+            parameter = path.split('@')[1].split('.')[0]
+            if 'w' in parameter and 'h' in parameter:
+                out_w = int(parameter.split('_')[0].replace('w', ''))
+                out_h = int(parameter.split('_')[1].replace('h', ''))
+                if out_w/img.width < 1 and out_h/img.height < 1:
+                    if out_w/img.width >= out_h/img.height:
+                        out_h = round(out_w*img.height/img.width)
+                        img = img.resize((out_w, out_h), Image.BILINEAR)
+                        img.save(f'./static/{out_path}')
+                    else:
+                        out_w = round(out_h*img.width/img.height)
+                        img = img.resize((out_w, out_h), Image.BILINEAR)
+                        img.save(f'./static/{out_path}')
+            elif 'w' in parameter:
+                out_w = int(parameter.replace('w', ''))
+                if out_w < img.width:
                     out_h = round(out_w*img.height/img.width)
                     img = img.resize((out_w, out_h), Image.BILINEAR)
                     img.save(f'./static/{out_path}')
-                else:
+            elif 'h' in parameter:
+                out_h = int(parameter.replace('h', ''))
+                if out_h < img.height:
                     out_w = round(out_h*img.width/img.height)
                     img = img.resize((out_w, out_h), Image.BILINEAR)
                     img.save(f'./static/{out_path}')
-        elif 'w' in parameter:
-            out_w = int(parameter.replace('w', ''))
-            if out_w < img.width:
-                out_h = round(out_w*img.height/img.width)
-                img = img.resize((out_w, out_h), Image.BILINEAR)
-                img.save(f'./static/{out_path}')
-        elif 'h' in parameter:
-            out_h = int(parameter.replace('h', ''))
-            if out_h < img.height:
-                out_w = round(out_h*img.width/img.height)
-                img = img.resize((out_w, out_h), Image.BILINEAR)
-                img.save(f'./static/{out_path}')
 
-        img.save(f'./static/{out_path}')
-        image_io = BytesIO()
-        img.save(image_io, io_type)
-        image_io.seek(0)
-        return send_file(image_io, mimetype=io_mimetype)
+            img.save(f'./static/{out_path}')
+            image_io = BytesIO()
+            img.save(image_io, io_type)
+            image_io.seek(0)
+            return send_file(image_io, mimetype=io_mimetype)
+
+        else:
+            return make_response('', 404)
 
 if __name__ == '__main__':
     app.run(port=10000)
