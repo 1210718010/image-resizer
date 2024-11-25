@@ -18,7 +18,7 @@ while True:
         os.chdir(d[0])
         if d[2] != []:
             for x in d[2]:
-                ctime = datetime.datetime.fromtimestamp(os.path.getmtime(x))
+                ctime = datetime.datetime.fromtimestamp(os.path.getatime(x))
                 if ctime < (now-delta):
                     os.remove(x)
                     n += 1
