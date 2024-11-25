@@ -22,7 +22,7 @@ app = Flask(__name__, static_folder='static')
 def resizer(path):
 
     out_path = path.replace('/', '_')
-    image = f'C:/Users/Admin/Documents/img/{path.split('@')[0]}'
+    image = f'./img/{path.split('@')[0]}'
     cache = f'./static/{out_path}'
 
     fileEx = path.split('@')[1].split('.')[1]
