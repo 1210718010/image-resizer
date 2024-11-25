@@ -2,6 +2,7 @@ from flask import Flask, send_from_directory, send_file, make_response
 from PIL import Image
 import pillow_avif
 from io import BytesIO
+import time
 import os
 
 app = Flask(__name__, static_folder='static')
@@ -21,6 +22,8 @@ app = Flask(__name__, static_folder='static')
 def resizer(path):
 
     out_path = path.replace('/', '_')
+    image = f'C:/Users/Admin/Documents/img/{path.split('@')[0]}'
+    cache = f'./static/{out_path}'
 
     fileEx = path.split('@')[1].split('.')[1]
     if fileEx.lower() == 'webp':
@@ -42,14 +45,12 @@ def resizer(path):
         io_type = 'ICO'
         io_mimetype = 'image/x-icon'
 
-    if os.path.isfile(f'./static/{out_path}'):
-        os.utime(f'./static/{out_path}', None)
+    if os.path.isfile(cache) and os.path.getmtime(cache) == os.path.getmtime(image):
+        os.utime(cache,(time.time(), os.path.getmtime(cache)))
         return send_from_directory(app.static_folder, out_path, mimetype=io_mimetype)
 
     else:
-        if os.path.isfile(f'C:/Users/Admin/Documents/img/{path.split("@")[0]}'):
-            image = f'C:/Users/Admin/Documents/img/{path.split("@")[0]}'
-            print(image)
+        if os.path.isfile(image):
             img = Image.open(image)
 
             parameter = path.split('@')[1].split('.')[0]
@@ -60,25 +61,26 @@ def resizer(path):
                     if out_w/img.width >= out_h/img.height:
                         out_h = round(out_w*img.height/img.width)
                         img = img.resize((out_w, out_h), Image.BILINEAR)
-                        img.save(f'./static/{out_path}')
+                        img.save(cache)
                     else:
                         out_w = round(out_h*img.width/img.height)
                         img = img.resize((out_w, out_h), Image.BILINEAR)
-                        img.save(f'./static/{out_path}')
+                        img.save(cache)
             elif 'w' in parameter:
                 out_w = int(parameter.replace('w', ''))
                 if out_w < img.width:
                     out_h = round(out_w*img.height/img.width)
                     img = img.resize((out_w, out_h), Image.BILINEAR)
-                    img.save(f'./static/{out_path}')
+                    img.save(cache)
             elif 'h' in parameter:
                 out_h = int(parameter.replace('h', ''))
                 if out_h < img.height:
                     out_w = round(out_h*img.width/img.height)
                     img = img.resize((out_w, out_h), Image.BILINEAR)
-                    img.save(f'./static/{out_path}')
+                    img.save(cache)
 
-            img.save(f'./static/{out_path}')
+            img.save(cache)
+            os.utime(cache,(time.time(), os.path.getmtime(image)))
             image_io = BytesIO()
             img.save(image_io, io_type)
             image_io.seek(0)
